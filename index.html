@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Timer Guide</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#5f666b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Service Guide">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    :root {
+      --bg: #edf0ee;
+      --card: #fbfbf8;
+      --text: #2b2f33;
+      --muted: #72777c;
+      --border: #d4d8d4;
+      --accent: #5f666b;
+      --accent-dark: #494f54;
+      --danger: #b91c1c;
+      --soft: #e4e4df;
+      --van-white: #f7f7f2;
+      --shadow: rgba(40, 40, 40, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, #5e6468, #8b9297);
+      color: white;
+      padding: 18px 16px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    header h1 { margin: 0; font-size: 22px; }
+    header p { margin: 6px 0 0; font-size: 14px; opacity: 0.9; }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 18px var(--shadow);
+    }
+
+    h2, h3 { margin-top: 0; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin: 10px 0 4px;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      font: inherit;
+    }
+
+    input, textarea {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: white;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+      background: white;
+    }
+
+    textarea { min-height: 80px; resize: vertical; }
+
+    .keyboard-spacer {
+      height: 0;
+    }
+
+    .typing-focus {
+      scroll-margin-bottom: 45vh;
+      scroll-margin-top: 90px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover { background: var(--accent-dark); }
+    button:focus, input:focus, textarea:focus {
+      outline: 2px solid rgba(95, 102, 107, 0.28);
+      outline-offset: 2px;
+    }
+    button.secondary { background: var(--soft); color: var(--text); }
+    button.secondary:hover { background: #d1d5db; }
+    button.danger { background: var(--danger); color: white; }
+    button.danger:hover { background: #991b1b; }
+    button.small { width: auto; padding: 8px 11px; margin: 0; font-size: 13px; }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .sidebar {
+      min-height: calc(100vh - 110px);
+    }
+
+    .detail-card {
+      min-height: calc(100vh - 110px);
+    }
+
+    .display-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .display-card {
+      min-height: 62px;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff, var(--van-white));
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .display-card.has-image {
+      background-size: cover;
+      background-position: center var(--hero-position-y, 50%);
+      background-repeat: no-repeat;
+      color: white;
+    }
+
+    .display-card.has-image::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(70,70,70,0.55), rgba(70,70,70,0.10));
+    }
+
+    .display-card-content { position: relative; z-index: 1; }
+    .display-title { font-weight: bold; font-size: 18px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .has-image .muted { color: rgba(255,255,255,0.85); }
+
+    .detail-shell {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .detail-title {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .detail-title h2 {
+      margin: 0 0 4px;
+      font-size: 26px;
+    }
+
+    .image-toolbar {
+      background: transparent;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    .image-toolbar label {
+      margin: 0 0 4px;
+      font-size: 12px;
+    }
+
+    .image-toolbar-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .image-toolbar button { margin: 0; }
+
+    .hero {
+      min-height: 170px;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #6c7277, #9ca3a8);
+      background-size: var(--hero-size, 100%);
+      background-position: center var(--hero-position-y, 50%);
+      background-repeat: no-repeat;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(60,60,60,0.55), rgba(60,60,60,0.10));
+    }
+
+    .hero-content { position: relative; z-index: 1; width: 100%; }
+    .hero h2 { margin-bottom: 4px; font-size: 24px; }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      background: var(--van-white);
+    }
+
+    .step.done .step-text { text-decoration: line-through; color: var(--muted); }
+    .step input[type="checkbox"] { width: 22px; height: 22px; margin-top: 3px; }
+
+    .step-image {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .step-caption {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .step-controls { display: flex; gap: 5px; }
+
+    .collapsed-add-step {
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: var(--van-white);
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .collapsed-add-step:hover {
+      background: #efefea;
+    }
+
+    .add-step-form {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: var(--van-white);
+    }
+
+    .camera-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .camera-buttons button,
+    .camera-buttons label {
+      margin: 0;
+    }
+
+    .camera-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      min-height: 44px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .empty { text-align: center; padding: 30px; color: var(--muted); }
+    .hide { display: none !important; }
+
+    .text-editor-page {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 10000;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .text-editor-topbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: 0 4px 18px var(--shadow);
+    }
+
+    .text-editor-title {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .text-editor-topbar button {
+      margin: 0;
+      width: auto;
+      min-width: 44px;
+      font-size: 20px;
+      padding: 8px 12px;
+    }
+
+    #fullscreenTextEditor {
+      flex: 1;
+      width: 100%;
+      min-height: 55vh;
+      font-size: 18px;
+      line-height: 1.45;
+      padding: 14px;
+      border-radius: 14px;
+      resize: none;
+    }
+
+    .confirm-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .confirm-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .confirm-box h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .confirm-actions button {
+      margin-top: 0;
+    }
+
+    .edit-step-form {
+      margin-top: 12px;
+    }
+
+    .edit-step-form textarea {
+      min-height: 90px;
+    }
+
+    .edit-preview-image {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .hero-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .hero-toolbar button {
+      width: auto;
+      margin: 0;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .image-size-slider {
+      margin-top: 10px;
+      background: var(--van-white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .image-size-slider label {
+      margin-top: 0;
+    }
+
+    .image-size-slider input[type="range"] {
+      width: 100%;
+    }
+
+    .slider-group {
+      margin-top: 14px;
+    }
+
+    .slider-value {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .add-display-page {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .add-display-page textarea {
+      min-height: 150px;
+    }
+
+    .single-page-mode {
+      grid-template-columns: 1fr;
+    }
+
+    .single-page-mode .sidebar {
+      display: none;
+    }
+    hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    @media (max-width: 720px) {
+      html {
+        scroll-padding-bottom: 45vh;
+      }
+
+      body {
+        padding-bottom: 42vh;
+      }
+
+      main { padding: 10px; }
+      .app-layout { grid-template-columns: 1fr; }
+      .sidebar { min-height: auto; }
+      .detail-shell { grid-template-columns: 1fr; }
+      .detail-shell button.small { width: 100%; }
+      .image-toolbar-row { grid-template-columns: 1fr; }
+      .hero { min-height: 180px; }
+      .step { grid-template-columns: auto 1fr; }
+      .step-controls { grid-column: 1 / -1; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Service Timer Guide</h1>
+    
+  </header>
+
+  <main>
+    <div id="appLayout" class="app-layout">
+      <aside id="sidebar" class="card sidebar">
+      <h2>Välj display</h2>
+      <div id="displayGrid" class="display-grid"></div>
+
+      <hr />
+
+      <button onclick="openAddDisplayPage()">+ Lägg till ny display</button>
+      </aside>
+
+      <section id="detailPage" class="card detail-card hide">
+      <div class="detail-shell">
+        <button class="small secondary" onclick="goHome()">← Tillbaka</button>
+
+        <div></div>
+
+        <button class="small danger" onclick="deleteSelectedDisplay()">Ta bort display</button>
+      </div>
+
+        <div id="detailContent"></div>
+      </section>
+
+      <section id="addDisplayPage" class="card detail-card add-display-page hide">
+        <div class="detail-shell">
+          <button class="small secondary" onclick="closeAddDisplayPage()">← Tillbaka</button>
+          <div></div>
+          <div></div>
+        </div>
+
+        <div class="detail-title">
+          <h2>Lägg till ny display</h2>
+          <div class="muted">Skapa en ny display/styrning</div>
+        </div>
+
+        <label for="newDisplayName">Namn</label>
+        <input id="newDisplayName" class="typing-focus mobile-full-editor" data-editor-title="Namn" placeholder="Ex. Insight 4000 Display" />
+
+        <label for="newDisplayNote">Anteckning / koder</label>
+        <textarea id="newDisplayNote" class="typing-focus mobile-full-editor" data-editor-title="Anteckning / koder" placeholder="Ex. Kod 0500"></textarea>
+
+        <button onclick="addDisplay()">+ Skapa display</button>
+      </section>
+    </div>
+    <div id="textEditorPage" class="text-editor-page hide">
+    <div class="text-editor-topbar">
+      <button class="small danger" onclick="closeTextEditor(false)">×</button>
+      <div id="textEditorTitle" class="text-editor-title">Skriv text</div>
+      <button class="small secondary" onclick="closeTextEditor(true)">✔</button>
+    </div>
+    <textarea id="fullscreenTextEditor"></textarea>
+  </div>
+
+  <div id="confirmModal" class="confirm-modal hide">
+    <div class="confirm-box">
+      <h3 id="confirmTitle">Bekräfta</h3>
+      <p id="confirmMessage">Är du säker?</p>
+      <div class="confirm-actions">
+        <button class="secondary" onclick="closeConfirmModal()">Avbryt</button>
+        <button class="danger" id="confirmOkButton">Ta bort</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editStepModal" class="confirm-modal hide">
+    <div class="confirm-box">
+      <h3>Redigera steg</h3>
+      <div class="edit-step-form">
+        <label for="editStepText">Text i servicesteg</label>
+        <input id="editStepText" class="mobile-full-editor" data-editor-title="Text i servicesteg" />
+
+        <label for="editStepImage">Byt bild</label>
+        <input id="editStepImage" type="file" accept="image/*" />
+
+        <img id="editStepPreview" class="edit-preview-image hide" alt="Nuvarande bild" />
+
+        <button class="secondary" onclick="removeImageFromEditingStep()">Ta bort bild från steg</button>
+
+        <label for="editStepCaption">Text under bilden</label>
+        <textarea id="editStepCaption" class="mobile-full-editor" data-editor-title="Text under bilden"></textarea>
+      </div>
+
+      <div class="confirm-actions">
+        <button class="secondary" onclick="closeEditStepModal()">Avbryt</button>
+        <button id="saveStepEditButton" onclick="saveStepEdit()">Spara</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+  <script>
+
+    const STORAGE_KEY = "serviceTimerDisplays_v3";
+    let displays = loadDisplays();
+    let selectedDisplayId = null;
+    let editingStepId = null;
+    let editingStepImage = "";
+    let pendingDisplayImage = "";
+    let activeTextField = null;
+    let activeTextOriginalValue = "";
+
+    function createId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    function loadDisplays() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+
+      return [
+        {
+          id: createId(),
+          name: "CEM7 / Himoinsa Display",
+          note: "Servicekod: 1111\nVerkstadskod: 1911\nMasterkod: okänd just nu",
+          image: "",
+          imageZoom: 100,
+          imagePositionY: 50,
+          steps: [
+            { id: createId(), text: "Tryck grön bock för att gå in i menyn", done: false, image: "", caption: "" },
+            { id: createId(), text: "Ange lösenord 1111 eller 1911", done: false, image: "", caption: "" },
+            { id: createId(), text: "Gå till service/intervall-menyn", done: false, image: "", caption: "" },
+            { id: createId(), text: "Välj återställ/nolla service timer", done: false, image: "", caption: "" },
+            { id: createId(), text: "Bekräfta återställning", done: false, image: "", caption: "" },
+            { id: createId(), text: "Kontrollera att nytt serviceintervall har startat", done: false, image: "", caption: "" }
+          ]
+        },
+        { id: createId(), name: "DSE Display", note: "Lägg in egna koder och menyväg här.", image: "", imageZoom: 100,
+          imagePositionY: 50, steps: [] },
+        { id: createId(), name: "Insight 4000 Display", note: "Kod: 0500", image: "", imageZoom: 100,
+          imagePositionY: 50, steps: [] }
+      ];
+    }
+
+    function saveDisplays() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(displays));
+        return true;
+      } catch (error) {
+        showAlertModal("Bilden är troligen för stor för att sparas lokalt. Prova med en mindre bild eller ta en ny bild lite längre ifrån.");
+        return false;
+      }
+    }
+    }
+
+    function getSelectedDisplay() {
+      return displays.find(display => display.id === selectedDisplayId);
+    }
+
+    function renderHome() {
+      const grid = document.getElementById("displayGrid");
+      grid.innerHTML = "";
+
+      displays.forEach(display => {
+        const card = document.createElement("div");
+        card.className = "display-card" + (display.image ? " has-image" : "");
+        if (display.image) card.style.backgroundImage = `url(${display.image})`;
+        card.onclick = () => openDisplay(display.id);
+        card.innerHTML = `
+          <div class="display-card-content">
+            <div class="display-title">${escapeHtml(display.name)}</div>
+            <div class="muted">${display.steps.length} steg</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function openDisplay(id) {
+      selectedDisplayId = id;
+      document.getElementById("appLayout").classList.add("single-page-mode");
+      document.getElementById("sidebar").classList.add("hide");
+      document.getElementById("detailPage").classList.remove("hide");
+      renderDetail();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function openAddDisplayPage() {
+      document.getElementById("appLayout").classList.add("single-page-mode");
+      document.getElementById("sidebar").classList.add("hide");
+      document.getElementById("detailPage").classList.add("hide");
+      document.getElementById("addDisplayPage").classList.remove("hide");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeAddDisplayPage() {
+      document.getElementById("appLayout").classList.remove("single-page-mode");
+      document.getElementById("sidebar").classList.remove("hide");
+      document.getElementById("addDisplayPage").classList.add("hide");
+      renderHome();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goHome() {
+      selectedDisplayId = null;
+      document.getElementById("appLayout").classList.remove("single-page-mode");
+      document.getElementById("sidebar").classList.remove("hide");
+      document.getElementById("detailPage").classList.add("hide");
+      document.getElementById("addDisplayPage").classList.add("hide");
+      renderHome();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderDetail() {
+      const display = getSelectedDisplay();
+      const content = document.getElementById("detailContent");
+      if (!display) return goHome();
+
+      const doneCount = display.steps.filter(step => step.done).length;
+      const heroSize = display.imageZoom || 100;
+      const heroPositionY = display.imagePositionY || 50;
+      const heroStyle = display.image ? `style="background-image:url(${display.image}); --hero-size:${heroSize}%; --hero-position-y:${heroPositionY}%"` : "";
+
+      content.innerHTML = `
+        <div class="detail-title">
+          <h2>${escapeHtml(display.name)}</h2>
+          <div class="muted">${doneCount} av ${display.steps.length} steg klara</div>
+        </div>
+
+        <div id="displayImageUpload" class="image-toolbar hide">
+          <label for="displayImageInput">Huvudbild på display</label>
+          <div class="image-toolbar-row">
+            <input id="displayImageInput" type="file" accept="image/*" onchange="setDisplayImage(event)" />
+          </div>
+        </div>
+
+        <div class="hero-toolbar">
+          <button 
+            id="confirmEditButton"
+            class="small secondary hide" 
+            onclick="confirmDisplayNameChange()"
+            title="Bekräfta ändringar"
+          >✔</button>
+          <button class="small secondary" onclick="toggleImageSizeEditor()">✎</button>
+          <button class="small danger" onclick="removeDisplayImage()">×</button>
+        </div>
+
+        <div id="imageSizeEditor" class="image-size-slider hide">
+          <label for="editName">Displaynamn</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input id="editName" class="mobile-full-editor" data-editor-title="Displaynamn" value="${escapeAttribute(display.name)}" />
+          </div>
+          <div class="slider-group">
+            <label for="imageZoomSlider">Justera bildstorlek</label>
+            <input 
+              id="imageZoomSlider" 
+              type="range" 
+              min="40" 
+              max="150" 
+              value="${display.imageZoom || 100}"
+              oninput="updateImageZoom(this.value)"
+            />
+            <div class="slider-value">Zoom: ${display.imageZoom || 100}%</div>
+          </div>
+
+          <div class="slider-group">
+            <label for="imagePositionSlider">Flytta bild upp / ner</label>
+            <input 
+              id="imagePositionSlider"
+              type="range"
+              min="0"
+              max="100"
+              value="${display.imagePositionY || 50}"
+              oninput="updateImagePosition(this.value)"
+            />
+            <div class="slider-value">Position: ${display.imagePositionY || 50}%</div>
+          </div>
+        </div>
+
+        <div class="hero" ${heroStyle}>
+        </div>
+
+        <div id="displayNameEditor" class="image-size-slider hide">
+          <label for="editName">Displaynamn</label>
+          <input id="editName" value="${escapeAttribute(display.name)}" oninput="updateDisplayName(this.value)" />
+        </div>
+
+        <label for="editNote">Anteckning / koder</label>
+        <textarea 
+          id="editNote" 
+          class="typing-focus mobile-full-editor"
+          data-editor-title="Anteckning / koder"
+          placeholder="Ex. Lägg in egna koder och menyvägar här"
+          onfocus="clearPlaceholderText(this)"
+          onblur="restorePlaceholderText(this)"
+          oninput="updateDisplayNote(this.value)"
+        >${escapeHtml(display.note || "")}</textarea>
+
+        <hr />
+
+        <h3>Servicesteg</h3>
+        <ul class="checklist" id="stepList"></ul>
+
+        <div id="collapsedAddStep" class="collapsed-add-step" onclick="toggleAddStepForm(true)">
+          + Lägg till nytt servicesteg
+        </div>
+
+        <div id="addStepForm" class="add-step-form hide">
+          <div class="hero-toolbar" style="justify-content:space-between; margin-bottom:12px;">
+            <strong>Nytt servicesteg</strong>
+            <button class="small danger" onclick="toggleAddStepForm(false)">×</button>
+          </div>
+
+          <label for="newStepText">Text i servicesteg</label>
+          <input id="newStepText" class="typing-focus mobile-full-editor" data-editor-title="Text i servicesteg" placeholder="Ex. Gå tillbaka och sedan längst ner" />
+
+          <label>Bild till detta steg</label>
+
+          <div class="camera-buttons">
+            <label class="camera-upload-label">
+              📷 Ta bild
+              <input id="newStepCameraImage" type="file" accept="image/*" capture="environment" class="hide" />
+            </label>
+
+            <label class="camera-upload-label">
+              🖼️ Välj bild
+              <input id="newStepImage" type="file" accept="image/*" class="hide" />
+            </label>
+          </div>
+
+          <label for="newStepCaption">Text under bilden</label>
+          <textarea id="newStepCaption" class="typing-focus mobile-full-editor" data-editor-title="Text under bilden" placeholder="Ex. Här syns knappen du ska trycka på"></textarea>
+
+          <button onclick="addStep()">✔ Lägg till servicesteg</button>
+        </div>
+        <button class="secondary" onclick="resetChecklist()">Nollställ bockar</button>
+      `;
+
+      renderStepList();
+    }
+
+    function renderStepList() {
+      const display = getSelectedDisplay();
+      const list = document.getElementById("stepList");
+      if (!display || !list) return;
+
+      if (display.steps.length === 0) {
+        list.innerHTML = `<li class="empty">Inga steg än. Lägg till första steget nedan.</li>`;
+        return;
+      }
+
+      list.innerHTML = "";
+      display.steps.forEach((step, index) => {
+        const item = document.createElement("li");
+        item.className = "step" + (step.done ? " done" : "");
+        item.innerHTML = `
+          <input type="checkbox" ${step.done ? "checked" : ""} onchange="toggleStep('${step.id}')" />
+          <div>
+            <div class="step-text">${index + 1}. ${escapeHtml(step.text)}</div>
+            ${step.image ? `<img class="step-image" src="${step.image}" alt="Stegbild" />` : ""}
+            ${step.caption ? `<div class="step-caption">${escapeHtml(step.caption)}</div>` : ""}
+          </div>
+          <div class="step-controls">
+            <button class="small secondary" onclick="moveStep('${step.id}', -1)">↑</button>
+            <button class="small secondary" onclick="moveStep('${step.id}', 1)">↓</button>
+            <button class="small secondary" onclick="openEditStepModal('${step.id}')">✎</button>
+            <button class="small danger" onclick="deleteStep('${step.id}')">×</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function addDisplay() {
+      const nameInput = document.getElementById("newDisplayName");
+      const noteInput = document.getElementById("newDisplayNote");
+      const name = nameInput.value.trim();
+      const note = noteInput.value.trim();
+
+      if (!name) {
+        showAlertModal("Skriv ett namn på displayen först.");
+        return;
+      }
+
+      const display = { 
+        id: createId(), 
+        name, 
+        note, 
+        image: "", 
+        imageZoom: 100,
+        imagePositionY: 50,
+        steps: [] 
+      };
+
+      displays.push(display);
+
+      const saved = saveDisplays();
+      if (!saved) {
+        displays.pop();
+        return;
+      }
+
+      nameInput.value = "";
+      noteInput.value = "";
+      document.getElementById("addDisplayPage").classList.add("hide");
+      renderHome();
+      openDisplay(display.id);
+    }
+
+    function deleteSelectedDisplay() {
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      showConfirmModal(
+        `Vill du ta bort "${display.name}"?`,
+        () => {
+          displays = displays.filter(item => item.id !== display.id);
+          saveDisplays();
+          goHome();
+        }
+      );
+    }
+
+    function confirmDisplayNameChange() {
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      const input = document.getElementById("editName");
+      const newName = input.value.trim();
+
+      if (!newName) {
+        showAlertModal("Displaynamn får inte vara tomt.");
+        return;
+      }
+
+      const zoomSlider = document.getElementById("imageZoomSlider");
+      const positionSlider = document.getElementById("imagePositionSlider");
+
+      if (zoomSlider) {
+        display.imageZoom = Number(zoomSlider.value);
+      }
+
+      if (positionSlider) {
+        display.imagePositionY = Number(positionSlider.value);
+      }
+
+      if (pendingDisplayImage) {
+        display.image = pendingDisplayImage;
+      }
+
+      display.name = newName;
+      saveDisplays();
+
+      const editor = document.getElementById("imageSizeEditor");
+      const confirmButton = document.getElementById("confirmEditButton");
+
+      const uploadBox = document.getElementById("displayImageUpload");
+
+      if (editor) editor.classList.add("hide");
+      if (confirmButton) confirmButton.classList.add("hide");
+      if (uploadBox) uploadBox.classList.add("hide");
+
+      pendingDisplayImage = "";
+
+      renderDetail();
+    }
+
+    function updateDisplayNote(value) {
+      const display = getSelectedDisplay();
+      if (!display) return;
+      display.note = value;
+      saveDisplays();
+    }
+
+    function setDisplayImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      readImage(file, imageData => {
+        pendingDisplayImage = imageData;
+
+        const hero = document.querySelector(".hero");
+        if (hero) {
+          hero.style.backgroundImage = `url(${imageData})`;
+        }
+      });
+    }
+
+    
+
+    function toggleImageSizeEditor() {
+      const editor = document.getElementById("imageSizeEditor");
+      const confirmButton = document.getElementById("confirmEditButton");
+      const uploadBox = document.getElementById("displayImageUpload");
+
+      if (!editor || !confirmButton || !uploadBox) return;
+
+      const isHidden = editor.classList.contains("hide");
+
+      editor.classList.toggle("hide");
+      uploadBox.classList.toggle("hide");
+      confirmButton.classList.toggle("hide", !isHidden);
+    }
+
+    function updateImageZoom(value) {
+      const hero = document.querySelector(".hero");
+      if (hero) {
+        hero.style.setProperty("--hero-size", `${value}%`);
+      }
+
+      const zoomText = document.querySelector("#imageSizeEditor .slider-group .slider-value");
+      if (zoomText) {
+        zoomText.textContent = `Zoom: ${value}%`;
+      }
+    }
+
+    function updateImagePosition(value) {
+      const hero = document.querySelector(".hero");
+      if (hero) {
+        hero.style.setProperty("--hero-position-y", `${value}%`);
+      }
+
+      const labels = document.querySelectorAll("#imageSizeEditor .slider-value");
+      if (labels[1]) {
+        labels[1].textContent = `Position: ${value}%`;
+      }
+    }
+
+    function removeDisplayImage() {
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      if (!display.image) {
+        showAlertModal("Det finns ingen huvudbild att ta bort.");
+        return;
+      }
+
+      showConfirmModal(
+        "Vill du verkligen ta bort huvudbilden?",
+        () => {
+          display.image = "";
+          saveDisplays();
+          renderDetail();
+        }
+      );
+    }
+
+    function addStep() {
+      const textInput = document.getElementById("newStepText");
+      const imageInput = document.getElementById("newStepImage");
+      const captionInput = document.getElementById("newStepCaption");
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      const text = textInput.value.trim();
+      const caption = captionInput.value.trim();
+      const cameraInput = document.getElementById("newStepCameraImage");
+      const file = imageInput.files[0] || cameraInput.files[0];
+
+      if (!text) return alert("Skriv ett steg först.");
+
+      const saveStep = imageData => {
+        display.steps.push({ id: createId(), text, done: false, image: imageData || "", caption });
+
+        const saved = saveDisplays();
+        if (!saved) {
+          display.steps.pop();
+          return;
+        }
+
+        renderDetail();
+        toggleAddStepForm(false);
+      };
+
+      if (file) readImage(file, saveStep);
+      else saveStep("");
+    }
+
+    function toggleAddStepForm(show) {
+      const collapsed = document.getElementById("collapsedAddStep");
+      const form = document.getElementById("addStepForm");
+
+      if (!collapsed || !form) return;
+
+      collapsed.classList.toggle("hide", show);
+      form.classList.toggle("hide", !show);
+    }
+
+    function toggleStep(stepId) {
+      const display = getSelectedDisplay();
+      const step = display?.steps.find(item => item.id === stepId);
+      if (!step) return;
+      step.done = !step.done;
+      saveDisplays();
+      renderDetail();
+    }
+
+    function openEditStepModal(stepId) {
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      const step = display.steps.find(item => item.id === stepId);
+      if (!step) return;
+
+      editingStepId = stepId;
+      editingStepImage = step.image || "";
+
+      document.getElementById("editStepText").value = step.text || "";
+      document.getElementById("editStepCaption").value = step.caption || "";
+      document.getElementById("editStepImage").value = "";
+
+      const preview = document.getElementById("editStepPreview");
+      if (editingStepImage) {
+        preview.src = editingStepImage;
+        preview.classList.remove("hide");
+      } else {
+        preview.src = "";
+        preview.classList.add("hide");
+      }
+
+      document.getElementById("editStepModal").classList.remove("hide");
+    }
+
+    function closeEditStepModal() {
+      editingStepId = null;
+      editingStepImage = "";
+      document.getElementById("editStepModal").classList.add("hide");
+    }
+
+    function removeImageFromEditingStep() {
+      editingStepImage = "";
+      const preview = document.getElementById("editStepPreview");
+      preview.src = "";
+      preview.classList.add("hide");
+      document.getElementById("editStepImage").value = "";
+    }
+
+    function saveStepEdit() {
+      const display = getSelectedDisplay();
+      if (!display || !editingStepId) return;
+
+      const step = display.steps.find(item => item.id === editingStepId);
+      if (!step) return;
+
+      const text = document.getElementById("editStepText").value.trim();
+      const caption = document.getElementById("editStepCaption").value.trim();
+      const file = document.getElementById("editStepImage").files[0];
+
+      if (!text) {
+        showAlertModal("Steget måste ha en text.");
+        return;
+      }
+
+      const saveChanges = imageData => {
+        step.text = text;
+        step.caption = caption;
+        step.image = imageData;
+        saveDisplays();
+        closeEditStepModal();
+        renderDetail();
+      };
+
+      if (file) readImage(file, saveChanges);
+      else saveChanges(editingStepImage);
+    }
+
+    function deleteStep(stepId) {
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      const step = display.steps.find(item => item.id === stepId);
+      if (!step) return;
+
+      showConfirmModal(
+        `Vill du verkligen ta bort steget "${step.text}"?`,
+        () => {
+          display.steps = display.steps.filter(step => step.id !== stepId);
+          saveDisplays();
+          renderDetail();
+        }
+      );
+    }
+
+    function moveStep(stepId, direction) {
+      const display = getSelectedDisplay();
+      if (!display) return;
+      const index = display.steps.findIndex(step => step.id === stepId);
+      const newIndex = index + direction;
+      if (index < 0 || newIndex < 0 || newIndex >= display.steps.length) return;
+      const [step] = display.steps.splice(index, 1);
+      display.steps.splice(newIndex, 0, step);
+      saveDisplays();
+      renderDetail();
+    }
+
+    function resetChecklist() {
+      const display = getSelectedDisplay();
+      if (!display) return;
+
+      showConfirmModal(
+        "Vill du nollställa alla bockar för denna display?",
+        () => {
+          display.steps.forEach(step => step.done = false);
+          saveDisplays();
+          renderDetail();
+        }
+      );
+    }
+
+    function showConfirmModal(message, onConfirm) {
+      const modal = document.getElementById("confirmModal");
+      const messageBox = document.getElementById("confirmMessage");
+      const confirmButton = document.getElementById("confirmOkButton");
+
+      messageBox.textContent = message;
+      modal.classList.remove("hide");
+
+      confirmButton.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+    }
+
+    function showAlertModal(message) {
+      const modal = document.getElementById("confirmModal");
+      const messageBox = document.getElementById("confirmMessage");
+      const confirmButton = document.getElementById("confirmOkButton");
+
+      messageBox.textContent = message;
+      modal.classList.remove("hide");
+
+      confirmButton.textContent = "OK";
+      confirmButton.onclick = () => {
+        closeConfirmModal();
+        confirmButton.textContent = "Ta bort";
+      };
+    }
+
+    function closeConfirmModal() {
+      document.getElementById("confirmModal").classList.add("hide");
+      document.getElementById("confirmOkButton").textContent = "Ta bort";
+    }
+
+    function readImage(file, callback) {
+      const reader = new FileReader();
+
+      reader.onload = event => {
+        const image = new Image();
+
+        image.onload = () => {
+          const maxWidth = 1200;
+          const maxHeight = 900;
+          let width = image.width;
+          let height = image.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+
+          const context = canvas.getContext("2d");
+          context.drawImage(image, 0, 0, width, height);
+
+          const compressedImage = canvas.toDataURL("image/jpeg", 0.75);
+          callback(compressedImage);
+        };
+
+        image.onerror = () => {
+          showAlertModal("Kunde inte läsa bilden. Prova med en annan bild.");
+        };
+
+        image.src = event.target.result;
+      };
+
+      reader.onerror = () => {
+        showAlertModal("Kunde inte läsa filen. Prova igen.");
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value);
+    }
+
+    function clearPlaceholderText(element) {
+      if (element.dataset.placeholderCleared === "true") return;
+
+      const defaultTexts = [
+        "Lägg in egna koder och menyväg här.",
+        "Lägg in egna koder och menyvägar här",
+        "Kod: 0500"
+      ];
+
+      if (defaultTexts.includes(element.value.trim())) {
+        element.value = "";
+        updateDisplayNote("");
+      }
+
+      element.dataset.placeholderCleared = "true";
+    }
+
+    function restorePlaceholderText(element) {
+      if (element.value.trim() === "") {
+        element.placeholder = "Ex. Lägg in egna koder och menyvägar här";
+      }
+    }
+
+    Object.assign(window, {
+      openDisplay,
+      openAddDisplayPage,
+      closeAddDisplayPage,
+      goHome,
+      addDisplay,
+      deleteSelectedDisplay,
+      confirmDisplayNameChange,
+      updateDisplayNote,
+      setDisplayImage,
+      toggleImageSizeEditor,
+      updateImageZoom,
+      updateImagePosition,
+      removeDisplayImage,
+      addStep,
+      toggleAddStepForm,
+      toggleStep,
+      openEditStepModal,
+      closeEditStepModal,
+      removeImageFromEditingStep,
+      saveStepEdit,
+      deleteStep,
+      moveStep,
+      resetChecklist,
+      closeConfirmModal,
+      closeTextEditor
+    });
+
+    setupMobileTypingHelp();
+    setupFullscreenTextEditor();
+    registerServiceWorker();
+    renderHome();
+
+    function registerServiceWorker() {
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("service-worker.js").catch(() => {
+            console.log("Service worker kunde inte registreras.");
+          });
+        });
+      }
+    }
+
+    function setupMobileTypingHelp() {
+      document.addEventListener("focusin", event => {
+        const element = event.target;
+        const isTextField = element.matches("input[type='text'], input:not([type]), textarea");
+
+        if (!isTextField || element.classList.contains("mobile-full-editor")) return;
+
+        setTimeout(() => {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+        }, 350);
+      });
+    }
+
+    function setupFullscreenTextEditor() {
+      document.addEventListener("focusin", event => {
+        const element = event.target;
+        if (!element.classList.contains("mobile-full-editor")) return;
+
+        if (element.id === "fullscreenTextEditor") return;
+
+        event.preventDefault();
+        openTextEditor(element);
+      });
+    }
+
+    function openTextEditor(element) {
+      activeTextField = element;
+      activeTextOriginalValue = element.value;
+
+      const page = document.getElementById("textEditorPage");
+      const editor = document.getElementById("fullscreenTextEditor");
+      const title = document.getElementById("textEditorTitle");
+
+      title.textContent = element.dataset.editorTitle || "Skriv text";
+      editor.value = element.value;
+      page.classList.remove("hide");
+
+      setTimeout(() => {
+        editor.focus();
+        editor.setSelectionRange(editor.value.length, editor.value.length);
+      }, 80);
+    }
+
+    function closeTextEditor(save) {
+      const page = document.getElementById("textEditorPage");
+      const editor = document.getElementById("fullscreenTextEditor");
+
+      if (activeTextField) {
+        activeTextField.value = save ? editor.value : activeTextOriginalValue;
+
+        if (save) {
+          activeTextField.dispatchEvent(new Event("input", { bubbles: true }));
+          activeTextField.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+
+      page.classList.add("hide");
+      activeTextField = null;
+      activeTextOriginalValue = "";
+    }
+  </script>
+</body>
+</html>
